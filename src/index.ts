@@ -22,3 +22,18 @@ app.listen(3000, () => {
 app.get('/', (req, res) => {
 	res.send('Success')
 })
+
+app.get('/login', async (req, res) => {
+	let authRoute = await Shopify.Auth.beginAuth(req, res, SHOP, '/auth/callback', true)
+	return res.redirect(authRoute)
+})
+
+app.get('/auth/callback', async (req, res) => {
+	try {
+		await Shopify.Auth.validateAuthCallback(req, res, req.query as unknown as AuthQuery	)
+	} catch (error) {
+		console.error(error)
+	}
+
+	return res.redirect('/')
+})
