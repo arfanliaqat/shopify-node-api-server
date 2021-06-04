@@ -15,7 +15,7 @@ Shopify.Context.initialize({
 	API_SECRET_KEY,
 	SCOPES: [SCOPES],
 	HOST_NAME: HOST,
-	IS_EMBEDDED_APP: true,
+	IS_EMBEDDED_APP: false,
 	API_VERSION: ApiVersion.October20,
 	SESSION_STORAGE: new Shopify.Session.CustomSessionStorage(
 		sessionStorage.storeCallback,
@@ -50,7 +50,6 @@ app.get('/background-job', async (req, res) => {
 })
 
 app.get('/login', async (req, res) => {
-	// TODO: Duplicated "https" on redirect URL from Shopify
 	let authRoute = await Shopify.Auth.beginAuth(req, res, SHOP, '/auth/callback', true)
 	return res.redirect(authRoute)
 })
