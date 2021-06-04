@@ -1,6 +1,10 @@
 import express from 'express'
 import Shopify, { ApiVersion, AuthQuery, GraphqlWithSession, WithSessionParams } from '@shopify/shopify-api'
+import RedisStore from './redis-store';
+
 require('dotenv').config()
+
+const sessionStorage = new RedisStore();
 
 const app = express()
 
@@ -12,7 +16,12 @@ Shopify.Context.initialize({
 	SCOPES: [SCOPES],
 	HOST_NAME: HOST,
 	IS_EMBEDDED_APP: true,
-	API_VERSION: ApiVersion.October20
+	API_VERSION: ApiVersion.October20,
+	SESSION_STORAGE: new Shopify.Session.CustomSessionStorage(
+		sessionStorage.storeCallback,
+		sessionStorage.loadCallback,
+		sessionStorage.deleteCallback,
+	),
 })
 
 app.get('/', (req, res) => {
@@ -42,7 +51,7 @@ app.get('/login', async (req, res) => {
 
 app.get('/auth/callback', async (req, res) => {
 	try {
-		await Shopify.Auth.validateAuthCallback(req, res, req.query as unknown as AuthQuery	)
+		await Shopify.Auth.validateAuthCallback(req, res, req.query as unknown as AuthQuery)
 		// TODO: Save token
 	} catch (error) {
 		console.error(error)
@@ -75,7 +84,7 @@ app.get('/graph-client', async (req, res) => {
 		req, res
 	}
 
-	const {client, session} = await Shopify.Utils.withSession(clientWithSessionParams) as GraphqlWithSession
+	const { client, session } = await Shopify.Utils.withSession(clientWithSessionParams) as GraphqlWithSession
 
 	const shopName = await client.query({
 		data: `
