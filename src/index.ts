@@ -1,5 +1,5 @@
 import express from 'express'
-import Shopify, { ApiVersion, AuthQuery } from '@shopify/shopify-api'
+import Shopify, { ApiVersion, AuthQuery, GraphqlWithSession, WithSessionParams } from '@shopify/shopify-api'
 require('dotenv').config()
 
 const app = express()
@@ -49,6 +49,48 @@ app.get('/auth/callback', async (req, res) => {
 	}
 
 	return res.redirect('/')
+})
+
+app.get('/products', async (req, res) => {
+	// Get accessToken
+	const session = await Shopify.Utils.loadCurrentSession(req, res)
+	// Create client for shop
+	const client = new Shopify.Clients.Rest(session.shop, session.accessToken)
+	// Make the API call
+	const products = await client.get({
+		path: 'products'
+	})
+
+	console.log('Load products', products)
+	res.json({
+		success: 1,
+		products
+	})
+})
+
+app.get('/graph-client', async (req, res) => {
+	const clientWithSessionParams: WithSessionParams = {
+		clientType: 'graphql',
+		isOnline: true,
+		req, res
+	}
+
+	const {client, session} = await Shopify.Utils.withSession(clientWithSessionParams) as GraphqlWithSession
+
+	const shopName = await client.query({
+		data: `
+			{
+				shop {
+					name
+				}
+			}
+		`
+	})
+
+	res.json({
+		success: 1,
+		shopName
+	})
 })
 
 app.listen(3000, () => {
