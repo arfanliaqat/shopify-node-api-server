@@ -19,6 +19,15 @@ app.get('/', (req, res) => {
 	res.send('Success')
 })
 
+app.get('/test', async (req, res) => {
+	// Required login again - if we don't have session accessToken
+	const session = await Shopify.Utils.loadCurrentSession(req, res, true)
+	res.json({
+		success: 1,
+		session
+	})
+})
+
 app.get('/login', async (req, res) => {
 	// TODO: Duplicated "https" on redirect URL from Shopify
 	let authRoute = await Shopify.Auth.beginAuth(req, res, SHOP, '/auth/callback', true)
@@ -28,6 +37,7 @@ app.get('/login', async (req, res) => {
 app.get('/auth/callback', async (req, res) => {
 	try {
 		await Shopify.Auth.validateAuthCallback(req, res, req.query as unknown as AuthQuery	)
+		// TODO: Save token
 	} catch (error) {
 		console.error(error)
 	}
