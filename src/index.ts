@@ -12,11 +12,7 @@ Shopify.Context.initialize({
 	SCOPES: [SCOPES],
 	HOST_NAME: HOST,
 	IS_EMBEDDED_APP: true,
-	API_VERSION: ApiVersion.April21
-})
-
-app.listen(3000, () => {
-	console.log('Node api server is now listening on port 300')
+	API_VERSION: ApiVersion.October20
 })
 
 app.get('/', (req, res) => {
@@ -36,4 +32,8 @@ app.get('/auth/callback', async (req, res) => {
 	}
 
 	return res.redirect('/')
+})
+
+app.listen(3000, () => {
+	console.log('Node api server is now listening on port 300')
 })
