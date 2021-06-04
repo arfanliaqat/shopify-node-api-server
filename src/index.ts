@@ -38,9 +38,15 @@ app.get('/test', async (req, res) => {
 })
 
 app.get('/background-job', async (req, res) => {
-	const session = await Shopify.Utils.loadOfflineSession(SHOP)
-	console.log('=======> session', SHOP, session)
-	res.send('Successfully load background-job')
+	// TODO: loadOfflineSession func not work
+	// const session = await Shopify.Utils.loadOfflineSession(SHOP)
+	const session = await Shopify.Utils.loadCurrentSession(req, res, true)
+	const r = await sessionStorage.loadCallback(session.id)
+	console.log('=======> session', SHOP, r)
+	res.json({
+		success: 1,
+		r
+	})
 })
 
 app.get('/login', async (req, res) => {
