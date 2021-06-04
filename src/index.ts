@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', async (req, res) => {
+	// TODO: Duplicated "https" on redirect URL from Shopify
 	let authRoute = await Shopify.Auth.beginAuth(req, res, SHOP, '/auth/callback', true)
 	return res.redirect(authRoute)
 })
