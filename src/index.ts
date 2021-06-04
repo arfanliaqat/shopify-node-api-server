@@ -28,6 +28,12 @@ app.get('/test', async (req, res) => {
 	})
 })
 
+app.get('/background-job', async (req, res) => {
+	const session = await Shopify.Utils.loadOfflineSession(SHOP)
+	console.log('=======> session', SHOP, session)
+	res.send('Successfully load background-job')
+})
+
 app.get('/login', async (req, res) => {
 	// TODO: Duplicated "https" on redirect URL from Shopify
 	let authRoute = await Shopify.Auth.beginAuth(req, res, SHOP, '/auth/callback', true)
